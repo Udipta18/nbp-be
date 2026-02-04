@@ -19,9 +19,23 @@ app.set('trust proxy', 1);
 app.use(helmet());
 
 // CORS configuration
+const allowedOrigins = config.cors.allowedOrigins;
+const isWildcard = allowedOrigins.length === 1 && allowedOrigins[0] === '*';
+
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || config.cors.allowedOrigins.includes(origin)) {
+        // Allow requests with no origin (like mobile apps or Postman)
+        if (!origin) {
+            return callback(null, true);
+        }
+        
+        // Allow all origins if wildcard is set
+        if (isWildcard) {
+            return callback(null, true);
+        }
+        
+        // Check against whitelist
+        if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
