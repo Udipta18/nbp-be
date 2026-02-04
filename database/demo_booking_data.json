@@ -1,0 +1,126 @@
+{
+    "project_title": "Hyperlocal Services Marketplace (Directory Mode)",
+    "version": "3.0",
+    "description": "Demo data structure for Provider Listings without Booking logic.",
+    "providers": [
+        {
+            "id": "prov_001",
+            "owner_id": "usr_002",
+            "name": "Amit's Super Electric",
+            "category": "Electrical",
+            "description": "Certified electrician with 10 years experience. We handle everything from small fuse repairs to complete house rewiring. Efficient, safe, and affordable.",
+            "phone": "+919800000000",
+            "email": "amit@electricworks.com",
+            "website": "https://amit-electric.com",
+            "address": "Shop 12, Main Market, Indiranagar",
+            "city": "Bangalore",
+            "state": "KA",
+            "zip_code": "560038",
+            "latitude": 12.9716,
+            "longitude": 77.5946,
+            "experience_years": 10,
+            "rating": 4.8,
+            "review_count": 124,
+            "is_verified": true,
+            "status": "APPROVED",
+            "image_url": "https://example.com/images/amit_electric_profile.jpg",
+            "gallery_images": [
+                "https://example.com/images/work_sample_1.jpg",
+                "https://example.com/images/work_sample_2.jpg"
+            ],
+            "social_links": {
+                "facebook": "https://facebook.com/amitelectric",
+                "instagram": "https://instagram.com/amitelectric"
+            },
+            "business_hours": {
+                "mon": "09:00 - 19:00",
+                "tue": "09:00 - 19:00",
+                "wed": "09:00 - 19:00",
+                "thu": "09:00 - 19:00",
+                "fri": "09:00 - 19:00",
+                "sat": "10:00 - 16:00",
+                "sun": "Closed"
+            },
+            "services": [
+                {
+                    "id": "srv_001",
+                    "name": "Fan Installation",
+                    "description": "Mounting and wiring of ceiling or wall fans. Includes safety check.",
+                    "price_starts_from": 250.00,
+                    "price_unit": "per unit",
+                    "image_url": "https://example.com/images/services/fan_install.jpg"
+                },
+                {
+                    "id": "srv_002",
+                    "name": "Full House Wiring Check",
+                    "description": "Comprehensive diagnostic of all electrical points and fuse box.",
+                    "price_starts_from": 1000.00,
+                    "price_unit": "fixed",
+                    "image_url": "https://example.com/images/services/wiring_check.jpg"
+                }
+            ],
+            "reviews": [
+                {
+                    "id": "rev_001",
+                    "user_name": "Rahul Sharma",
+                    "rating": 5,
+                    "comment": "Excellent work! Very professional and on time.",
+                    "created_at": "2023-11-12T10:00:00Z"
+                },
+                {
+                    "id": "rev_002",
+                    "user_name": "Priya Singh",
+                    "rating": 4,
+                    "comment": "Good job but arrived slightly late.",
+                    "created_at": "2023-11-05T14:30:00Z"
+                }
+            ]
+        },
+        {
+            "id": "prov_002",
+            "owner_id": "usr_005",
+            "name": "CleanSweep Home Services",
+            "category": "Cleaning",
+            "description": "Professional home cleaning services. Deep cleaning, sofa cleaning, and more using eco-friendly products.",
+            "phone": "+919876543210",
+            "email": "contact@cleanswur.com",
+            "website": null,
+            "address": "45, 2nd Cross, Koramangala",
+            "city": "Bangalore",
+            "state": "KA",
+            "zip_code": "560034",
+            "latitude": 12.9352,
+            "longitude": 77.6245,
+            "experience_years": 5,
+            "rating": 4.5,
+            "review_count": 89,
+            "is_verified": true,
+            "status": "APPROVED",
+            "image_url": "https://example.com/images/cleansweep_profile.jpg",
+            "gallery_images": [
+                "https://example.com/images/cleaning_1.jpg"
+            ],
+            "social_links": null,
+            "business_hours": {
+                "mon": "08:00 - 20:00",
+                "tue": "08:00 - 20:00",
+                "wed": "08:00 - 20:00",
+                "thu": "08:00 - 20:00",
+                "fri": "08:00 - 20:00",
+                "sat": "09:00 - 18:00",
+                "sun": "09:00 - 18:00"
+            },
+            "services": [
+                {
+                    "id": "srv_003",
+                    "name": "Deep Cleaning (2 BHK)",
+                    "description": "Full home deep cleaning including floor, kitchen, and bathroom scrubbing.",
+                    "price_starts_from": 3500.00,
+                    "price_unit": "fixed",
+                    "image_url": "https://example.com/images/services/deep_clean.jpg"
+                }
+            ],
+            "reviews": []
+        }
+    ]
+}
