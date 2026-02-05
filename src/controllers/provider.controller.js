@@ -4,7 +4,7 @@ const { asyncHandler, NotFoundError, BadRequestError } = require('../middleware/
 const config = require('../config');
 
 const createProvider = asyncHandler(async (req, res) => {
-    const { name, phone, category, description, email, website, address, city, state, zip_code, latitude, longitude, experience_years } = req.body;
+    const { name, phone, category, description, email, website, address, city, state, zip_code, latitude, longitude, experience_years, ward_number } = req.body;
     let imageUrl = null;
 
     if (req.file) {
@@ -28,6 +28,7 @@ const createProvider = asyncHandler(async (req, res) => {
             latitude: latitude ? parseFloat(latitude) : null,
             longitude: longitude ? parseFloat(longitude) : null,
             experience_years: experience_years ? parseInt(experience_years, 10) : 0,
+            ward_number: parseInt(ward_number, 10),
             image_url: imageUrl,
             status: 'PENDING',
             rating: 0,
@@ -54,7 +55,7 @@ const createProvider = asyncHandler(async (req, res) => {
 });
 
 const getProviders = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, category, search, sort = 'created_at', order = 'desc' } = req.query;
+    const { page = 1, limit = 10, category, search, ward, sort = 'created_at', order = 'desc' } = req.query;
     const pageNum = parseInt(page, 10);
     const limitNum = Math.min(parseInt(limit, 10), 50);
     const offset = (pageNum - 1) * limitNum;
@@ -62,6 +63,12 @@ const getProviders = asyncHandler(async (req, res) => {
     let query = supabase.from('providers').select('*', { count: 'exact' }).eq('status', 'APPROVED');
     if (category) query = query.eq('category', category);
     if (search) query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+    if (ward) {
+        const wardNum = parseInt(ward, 10);
+        if (wardNum >= 1 && wardNum <= 20) {
+            query = query.eq('ward_number', wardNum);
+        }
+    }
     query = query.order(sort, { ascending: order === 'asc' }).range(offset, offset + limitNum - 1);
 
     const { data, error, count } = await query;

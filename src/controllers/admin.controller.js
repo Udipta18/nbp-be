@@ -144,4 +144,46 @@ const getStats = asyncHandler(async (req, res) => {
     });
 });
 
-module.exports = { getPendingProviders, getAllProviders, getProviderByIdAdmin, approveProvider, rejectProvider, deleteProvider, getStats };
+const updateProvider = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { ward_number, name, phone, category, description, email, website, address, city, state, zip_code } = req.body;
+
+    const updates = { updated_at: new Date().toISOString() };
+
+    // Validate ward_number if provided
+    if (ward_number !== undefined) {
+        const wardNum = parseInt(ward_number, 10);
+        if (isNaN(wardNum) || wardNum < 1 || wardNum > 20) {
+            throw new BadRequestError('Ward number must be between 1 and 20');
+        }
+        updates.ward_number = wardNum;
+    }
+
+    // Add other fields if provided
+    if (name) updates.name = name.trim();
+    if (phone) updates.phone = phone.trim();
+    if (category) updates.category = category.trim();
+    if (description !== undefined) updates.description = description?.trim() || null;
+    if (email !== undefined) updates.email = email?.trim() || null;
+    if (website !== undefined) updates.website = website?.trim() || null;
+    if (address !== undefined) updates.address = address?.trim() || null;
+    if (city !== undefined) updates.city = city?.trim() || null;
+    if (state !== undefined) updates.state = state?.trim() || null;
+    if (zip_code !== undefined) updates.zip_code = zip_code?.trim() || null;
+
+    const { data, error } = await supabaseAdmin
+        .from('providers')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error) {
+        console.error('❌ Update failed:', error);
+        throw new NotFoundError('Provider not found');
+    }
+
+    res.json({ success: true, message: 'Provider updated successfully', data });
+});
+
+module.exports = { getPendingProviders, getAllProviders, getProviderByIdAdmin, approveProvider, rejectProvider, deleteProvider, updateProvider, getStats };

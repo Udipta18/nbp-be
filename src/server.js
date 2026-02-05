@@ -19,8 +19,21 @@ app.set('trust proxy', 1);
 app.use(helmet());
 
 // CORS configuration
-const allowedOrigins = config.cors.allowedOrigins;
-const isWildcard = allowedOrigins.length === 1 && allowedOrigins[0] === '*';
+// CORS configuration
+// Fallback to '*' if undefined to ensure it works
+let allowedOrigins = config.cors.allowedOrigins || ['*'];
+// If it's a string (env var issue), try to parse or treat as single
+if (typeof allowedOrigins === 'string') {
+    allowedOrigins = allowedOrigins.split(',').map(o => o.trim());
+}
+
+// Normalize origins (remove trailing slashes) to ensure matching works
+const validOrigins = allowedOrigins.map(origin => origin.replace(/\/$/, ''));
+
+// Check if wildcard is present
+const isWildcard = allowedOrigins.includes('*') || (allowedOrigins.length === 1 && allowedOrigins[0] === '*');
+
+console.log('🌐 CORS Config:', { isWildcard, validOrigins }); // Debug log
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -34,10 +47,11 @@ app.use(cors({
             return callback(null, true);
         }
         
-        // Check against whitelist
-        if (allowedOrigins.includes(origin)) {
+        // Check against normalized whitelist
+        if (validOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            console.log(`❌ CORS Blocked: Origin ${origin} not in whitelist`, validOrigins);
             callback(new Error('Not allowed by CORS'));
         }
     },

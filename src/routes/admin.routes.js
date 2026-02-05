@@ -28,4 +28,7 @@ router.patch('/providers/:id/reject', validateProviderId, adminController.reject
 // DELETE /admin/providers/:id - Delete provider
 router.delete('/providers/:id', validateProviderId, adminController.deleteProvider);
 
+// PATCH /admin/providers/:id - Update provider (including ward_number)
+router.patch('/providers/:id', validateProviderId, adminController.updateProvider);
+
 module.exports = router;

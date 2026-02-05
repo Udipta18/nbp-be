@@ -114,6 +114,12 @@ const validateProviderCreate = [
         .isInt({ min: 0, max: 100 })
         .withMessage('Experience years must be between 0 and 100'),
     
+    body('ward_number')
+        .notEmpty()
+        .withMessage('Ward number is required')
+        .isInt({ min: 1, max: 20 })
+        .withMessage('Ward number must be between 1 and 20'),
+    
     handleValidation
 ];
 
@@ -163,6 +169,11 @@ const validateProviderQuery = [
         .optional()
         .isIn(['asc', 'desc'])
         .withMessage('Order must be either asc or desc'),
+    
+    query('ward')
+        .optional()
+        .isInt({ min: 1, max: 20 })
+        .withMessage('Ward must be between 1 and 20'),
     
     handleValidation
 ];
