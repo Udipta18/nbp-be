@@ -7,6 +7,9 @@ const { validateProviderCreate, validateProviderId, validateProviderQuery } = re
 // POST /providers - Create new provider (with image upload)
 router.post('/', uploadImage, validateProviderCreate, providerController.createProvider);
 
+// GET /providers/tags - Get available tags (must be before /:id route)
+router.get('/tags', providerController.getTags);
+
 // GET /providers - Get all approved providers
 router.get('/', validateProviderQuery, providerController.getProviders);
 

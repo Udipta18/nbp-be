@@ -175,6 +175,12 @@ const validateProviderQuery = [
         .isInt({ min: 1, max: 20 })
         .withMessage('Ward must be between 1 and 20'),
     
+    query('tags')
+        .optional()
+        .trim()
+        .isLength({ min: 1, max: 200 })
+        .withMessage('Tags must be a comma-separated string'),
+    
     handleValidation
 ];
 

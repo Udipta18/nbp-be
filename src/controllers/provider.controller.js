@@ -55,7 +55,7 @@ const createProvider = asyncHandler(async (req, res) => {
 });
 
 const getProviders = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, category, search, ward, sort = 'created_at', order = 'desc' } = req.query;
+    const { page = 1, limit = 10, category, search, ward, tags, sort = 'created_at', order = 'desc' } = req.query;
     const pageNum = parseInt(page, 10);
     const limitNum = Math.min(parseInt(limit, 10), 50);
     const offset = (pageNum - 1) * limitNum;
@@ -67,6 +67,13 @@ const getProviders = asyncHandler(async (req, res) => {
         const wardNum = parseInt(ward, 10);
         if (wardNum >= 1 && wardNum <= 20) {
             query = query.eq('ward_number', wardNum);
+        }
+    }
+    // Filter by tags (provider must have ALL specified tags)
+    if (tags) {
+        const tagArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+        if (tagArray.length > 0) {
+            query = query.contains('tags', tagArray);
         }
     }
     query = query.order(sort, { ascending: order === 'asc' }).range(offset, offset + limitNum - 1);
@@ -105,4 +112,24 @@ const getCategories = asyncHandler(async (req, res) => {
     res.json({ success: true, data: data || config.categories.map(name => ({ name })) });
 });
 
-module.exports = { createProvider, getProviders, getProviderById, getProviderReviews, getCategories };
+const getTags = asyncHandler(async (req, res) => {
+    const { category } = req.query;
+    
+    let query = supabase.from('tags').select('slug, display_name, icon, color, category_specific');
+    
+    // If category specified, filter tags that are universal (NULL) or include this category
+    if (category) {
+        query = query.or(`category_specific.is.null,category_specific.cs.{${category}}`);
+    }
+    
+    const { data, error } = await query.order('display_name');
+    
+    if (error) {
+        console.error('Tags fetch error:', error);
+        throw new BadRequestError('Failed to fetch tags');
+    }
+    
+    res.json({ success: true, data: data || [] });
+});
+
+module.exports = { createProvider, getProviders, getProviderById, getProviderReviews, getCategories, getTags };

@@ -146,7 +146,7 @@ const getStats = asyncHandler(async (req, res) => {
 
 const updateProvider = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { ward_number, name, phone, category, description, email, website, address, city, state, zip_code } = req.body;
+    const { ward_number, name, phone, category, description, email, website, address, city, state, zip_code, tags } = req.body;
 
     const updates = { updated_at: new Date().toISOString() };
 
@@ -157,6 +157,31 @@ const updateProvider = asyncHandler(async (req, res) => {
             throw new BadRequestError('Ward number must be between 1 and 20');
         }
         updates.ward_number = wardNum;
+    }
+
+    // Validate and add tags if provided
+    if (tags !== undefined) {
+        if (!Array.isArray(tags)) {
+            throw new BadRequestError('Tags must be an array');
+        }
+        // Allowed tags (must match database tags table)
+        const allowedTags = [
+            // Universal
+            'verified', '5_star', '24x7', 'upi_accepted',
+            // Food/Tiffin
+            'free_delivery', 'veg_only', 'home_cooked',
+            // Services
+            'same_day', 'insured', 'govt_certified', 'emergency_available',
+            // Doctors
+            'mbbs', 'video_consult', 'home_visit',
+            // Ambulance
+            'icu_equipped', 'oxygen'
+        ];
+        const invalidTags = tags.filter(t => !allowedTags.includes(t));
+        if (invalidTags.length > 0) {
+            throw new BadRequestError(`Invalid tags: ${invalidTags.join(', ')}`);
+        }
+        updates.tags = tags;
     }
 
     // Add other fields if provided
