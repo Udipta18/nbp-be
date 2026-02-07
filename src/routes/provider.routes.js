@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const providerController = require('../controllers/provider.controller');
-const { uploadImage } = require('../middleware/upload');
+const { uploadProviderWithGallery } = require('../middleware/upload');
 const { validateProviderCreate, validateProviderId, validateProviderQuery } = require('../middleware/validate');
 
-// POST /providers - Create new provider (with image upload)
-router.post('/', uploadImage, validateProviderCreate, providerController.createProvider);
+// POST /providers - Create new provider (with profile image + gallery)
+router.post('/', uploadProviderWithGallery, validateProviderCreate, providerController.createProvider);
 
 // GET /providers/tags - Get available tags (must be before /:id route)
 router.get('/tags', providerController.getTags);

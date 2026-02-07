@@ -27,7 +27,8 @@ const config = {
 
     // Upload settings
     upload: {
-        maxFileSize: 2 * 1024 * 1024, // 2MB in bytes
+        maxFileSize: 5 * 1024 * 1024, // 5MB per file
+        maxGalleryFiles: 6,            // Max gallery images allowed
         allowedMimeTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     },
 

@@ -6,10 +6,21 @@ const config = require('../config');
 const createProvider = asyncHandler(async (req, res) => {
     const { name, phone, category, description, email, website, address, city, state, zip_code, latitude, longitude, experience_years, ward_number } = req.body;
     let imageUrl = null;
+    let galleryUrls = [];
 
-    if (req.file) {
-        const uploadResult = await uploadImage(req.file.buffer);
+    // Handle profile image (req.files.image is an array with fields())
+    if (req.files?.image && req.files.image[0]) {
+        const uploadResult = await uploadImage(req.files.image[0].buffer, { folder: 'providers/profile' });
         imageUrl = uploadResult.url;
+    }
+
+    // Handle gallery images (up to 6)
+    if (req.files?.gallery_images && req.files.gallery_images.length > 0) {
+        const galleryUploads = req.files.gallery_images.map(file =>
+            uploadImage(file.buffer, { folder: 'providers/gallery' })
+        );
+        const galleryResults = await Promise.all(galleryUploads);
+        galleryUrls = galleryResults.map(r => r.url);
     }
 
     const { data, error } = await supabaseAdmin
@@ -30,6 +41,7 @@ const createProvider = asyncHandler(async (req, res) => {
             experience_years: experience_years ? parseInt(experience_years, 10) : 0,
             ward_number: parseInt(ward_number, 10),
             image_url: imageUrl,
+            gallery_images: galleryUrls,
             status: 'PENDING',
             rating: 0,
             review_count: 0,
@@ -40,8 +52,13 @@ const createProvider = asyncHandler(async (req, res) => {
 
     if (error) {
         console.error('Supabase error:', error);
+        // Cleanup uploaded images on failure
         if (imageUrl) {
             const publicId = extractPublicId(imageUrl);
+            if (publicId) await deleteImage(publicId).catch(console.error);
+        }
+        for (const url of galleryUrls) {
+            const publicId = extractPublicId(url);
             if (publicId) await deleteImage(publicId).catch(console.error);
         }
         throw new BadRequestError('Failed to create provider');
@@ -50,7 +67,13 @@ const createProvider = asyncHandler(async (req, res) => {
     res.status(201).json({
         success: true,
         message: 'Provider submitted successfully. Pending approval.',
-        data: { id: data.id, name: data.name, category: data.category, status: data.status }
+        data: { 
+            id: data.id, 
+            name: data.name, 
+            category: data.category, 
+            status: data.status,
+            gallery_images: data.gallery_images
+        }
     });
 });
 

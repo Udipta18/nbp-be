@@ -45,7 +45,7 @@ const upload = multer({
     fileFilter,
     limits: {
         fileSize: config.upload.maxFileSize,
-        files: 1 // Only allow 1 file per request
+        files: 7 // 1 profile + 6 gallery
     }
 });
 
@@ -63,7 +63,7 @@ const handleUploadError = (error, req, res, next) => {
             return res.status(400).json({
                 success: false,
                 error: 'File too large',
-                message: `Maximum file size is ${config.upload.maxFileSize / (1024 * 1024)}MB`
+                message: `Maximum file size is ${config.upload.maxFileSize / (1024 * 1024)}MB per file`
             });
         }
         
@@ -71,7 +71,7 @@ const handleUploadError = (error, req, res, next) => {
             return res.status(400).json({
                 success: false,
                 error: 'Too many files',
-                message: 'Only 1 file can be uploaded at a time'
+                message: `Maximum ${config.upload.maxGalleryFiles} gallery images allowed`
             });
         }
 
@@ -79,7 +79,7 @@ const handleUploadError = (error, req, res, next) => {
             return res.status(400).json({
                 success: false,
                 error: 'Unexpected field',
-                message: 'Image field name should be "image"'
+                message: 'Allowed fields: "image" (profile) and "gallery_images" (gallery)'
             });
         }
 
@@ -108,11 +108,7 @@ const handleUploadError = (error, req, res, next) => {
 const uploadSingle = upload.single('image');
 
 /**
- * Wrapped upload middleware with error handling
- * 
- * @param {Request} req - Express request
- * @param {Response} res - Express response
- * @param {Function} next - Next middleware
+ * Wrapped upload middleware with error handling (single image)
  */
 const uploadImage = (req, res, next) => {
     uploadSingle(req, res, (error) => {
@@ -123,8 +119,31 @@ const uploadImage = (req, res, next) => {
     });
 };
 
+/**
+ * Multi-image upload middleware for provider with gallery
+ * Accepts: 'image' (1 profile) + 'gallery_images' (up to 6)
+ */
+const uploadProviderImages = upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'gallery_images', maxCount: config.upload.maxGalleryFiles }
+]);
+
+/**
+ * Wrapped upload middleware with error handling (provider with gallery)
+ */
+const uploadProviderWithGallery = (req, res, next) => {
+    uploadProviderImages(req, res, (error) => {
+        if (error) {
+            return handleUploadError(error, req, res, next);
+        }
+        next();
+    });
+};
+
 module.exports = {
     upload,
     uploadImage,
+    uploadProviderWithGallery,
     handleUploadError
 };
+
